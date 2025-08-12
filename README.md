@@ -1,6 +1,5 @@
-==============================
- Playwright Test Quick Reference
-==============================
+Playwright Test Quick Reference
+
 
 1. Running Tests:
 

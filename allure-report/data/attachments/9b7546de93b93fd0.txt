@@ -1,0 +1,4 @@
+Test 1: Monitors list check started
+Number of monitors found: 9
+Monitors found: [ 'Apple monitor 24', 'ASUS Full HD' ]
+Test 1: Monitors list check completed

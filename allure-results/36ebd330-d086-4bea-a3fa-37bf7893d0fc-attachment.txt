@@ -1,0 +1,2 @@
+Test 2: Verify MacBook air details started
+Test 2: Verify MacBook air details completed

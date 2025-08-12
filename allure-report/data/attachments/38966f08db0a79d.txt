@@ -1,0 +1,2 @@
+Test 2: Verify Apple monitor 24 details started
+Test 2: Verify Apple monitor 24 details completed

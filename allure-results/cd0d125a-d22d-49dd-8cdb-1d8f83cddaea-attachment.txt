@@ -1,0 +1,4 @@
+Test 3: Add MacBook air to cart started
+Alert appeared: Product added
+Product in cart: MacBook air
+Test 3: Add MacBook air to cart completed

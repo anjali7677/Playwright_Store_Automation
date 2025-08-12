@@ -1,0 +1,11 @@
+Test 1: Laptops list check started
+Number of laptops found: 9
+Laptops found: [
+  'Sony vaio i5',
+  'Sony vaio i7\n',
+  'MacBook air',
+  'Dell i7 8gb',
+  '2017 Dell 15.6 Inch',
+  'MacBook Pro'
+]
+Test 1: Laptops list check completed

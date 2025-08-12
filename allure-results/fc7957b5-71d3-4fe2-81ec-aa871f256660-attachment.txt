@@ -1,0 +1,4 @@
+Test 3: Add Apple monitor 24 to cart started
+Alert appeared: Product added
+Product in cart: Apple monitor 24
+Test 3: Add Apple monitor 24 to cart completed

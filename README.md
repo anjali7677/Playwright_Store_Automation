@@ -1,108 +1,290 @@
-Playwright Test Quick Reference
+# Playwright JavaScript Test Execution Guide
 
+## 1. Prerequisites
 
-1. Running Tests:
+### Install Node.js & npm
+Playwright requires **Node.js** (v18 or above recommended) and **npm**.
 
-- Run all tests in all browsers (default):
-  npx playwright test
+#### Windows
+1. Download the installer from: [https://nodejs.org]
+2. Run the installer, ensure **"Add to PATH"** is checked.
+3. Verify installation:
+   ```bash
+   node -v
+   npm -v
+   ```
 
-- Run tests only in Chromium:
-  npx playwright test --project=chromium
+#### macOS (using Homebrew)
+```bash
+brew install node
+node -v
+npm -v
+```
 
-- Run a specific test file:
-  npx playwright test tests/yourTestFile.spec.js
+#### Linux (Ubuntu/Debian)
+```bash
+sudo apt update
+sudo apt install -y nodejs npm
+node -v
+npm -v
+```
 
-- Run with debug mode (headful + slow motion):
-  npx playwright test --headed --slow-mo=1000
+---
 
-2. Viewing Reports:
+## 2. Install Project Dependencies
 
-- Show built-in HTML report after test run:
-  npx playwright show-report
+Inside your project folder:
+```bash
+npm install
+```
 
-- Generate and open Allure report (after tests):
-  npm run test
-  npm run allure:generate
-  npm run allure:open
+If Playwright is not yet installed:
+```bash
+npm init playwright@latest
+```
+Choose **JavaScript** during setup if prompted.
 
+---
 
-3. Playwright Config Notes:
+## 3. Playwright Commands for Test Execution
 
-- Multiple reporters setup example in playwright.config.ts:
+### Run All Tests
+```bash
+npx playwright test
+```
 
-  reporter: [
-    ['list'],                              // Console output
-    ['html', { open: 'never' }],          // Built-in HTML report
-    ['allure-playwright', { outputFolder: 'my-allure-results' }],  // Allure reporter
-  ],
+### Run a Specific Test File
+```bash
+npx playwright test tests/example.spec.js
+```
 
-- Screenshot and video config:
+### Run Tests by Title
+```bash
+npx playwright test -g "should display login page"
+```
 
-  use: {
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
-    trace: 'on-first-retry',
-  }
+### Run with UI Mode (Interactive)
+```bash
+npx playwright test --ui
+```
 
-4. Useful Playwright Test API:
+### Run in a Specific Browser
+```bash
+npx playwright test --project=chromium
+npx playwright test --project=firefox
+npx playwright test --project=webkit
+```
 
-- test.step() to create named steps in report:
+### Run Headed Mode (Visible Browser)
+```bash
+npx playwright test --headed
+```
 
-  await test.step('Description', async () => {
-    // test actions
-  });
+### Debug Mode
+```bash
+npx playwright test --debug
+```
 
-- Assertions:
-
-  await expect(page.locator('selector')).toBeVisible();
-  await expect(page).toHaveTitle('Page Title');
-  await expect(locator).toHaveText('Expected Text');
-  await expect(locator).toHaveCount(n);
-
-- Handling dialogs/alerts:
-
-  page.once('dialog', dialog => dialog.accept());
-
-5. Locator Files:
-
-- Keep selectors organized in locators files, e.g.,
-
-  const homePageLocators = {
-    loginButton: '#login2',
-    loginUsernameInput: '#loginusername',
-    loginPasswordInput: '#loginpassword',
-    loginSubmitButton: "//button[text()='Log in']",
-    logoutLink: "//a[text()='Log out']",
-  };
-
-- Import and use in tests:
-
-  import homePageLocators from './locators/homePageLocators';
-  await page.click(homePageLocators.loginButton);
-
-6. Tips:
-
-- Use retries for flaky tests, especially on CI:
-  retries: process.env.CI ? 2 : 0
-
-- Use workers: 1 on CI to avoid race conditions:
-  workers: process.env.CI ? 1 : undefined
-
-- Use trace collection for debugging flaky tests:
-  trace: 'on-first-retry'
-
-- Use meaningful console.log messages inside tests for easier debugging.
-
-7. NPM Scripts Suggestions (add to package.json):
-
-  "scripts": {
-    "test": "playwright test",
-    "test:chromium": "playwright test --project=chromium",
-    "allure:generate": "allure generate my-allure-results --clean -o allure-report",
-    "allure:open": "allure open allure-report"
-  }
+### Run Tests in Parallel
+(Playwright runs in parallel by default, but you can specify workers)
+```bash
+npx playwright test --workers=4
+```
 
 ---
 
 
+## 4. Common Playwright Methods (JavaScript) — Dual Usage Examples
 
+### Navigation
+```javascript
+await page.goto('https://example.com'); 
+// No locator alternative — only page method
+```
+
+### Click an Element
+```javascript
+await page.click('button#submit'); 
+await page.locator('text=Submit').click(); // locator.click()
+await click(page.locator('text=Submit'));  // click(locator)
+```
+
+### Fill Input Field
+```javascript
+await page.fill('input#username', 'myUser');
+await page.locator('input[name="email"]').fill('test@example.com'); // locator.fill()
+await fill(page.locator('input[name="email"]'), 'test@example.com'); // fill(locator, value)
+```
+
+### Type with Delay
+```javascript
+await page.type('input#search', 'Playwright', { delay: 100 });
+await page.locator('input#search').type('Playwright', { delay: 100 });
+await type(page.locator('input#search'), 'Playwright', { delay: 100 });
+```
+
+### Press a Key
+```javascript
+await page.press('input#search', 'Enter');
+await page.locator('input#search').press('Enter');
+await press(page.locator('input#search'), 'Enter');
+```
+
+### Select from Dropdown
+```javascript
+await page.selectOption('#country', 'India');
+await page.locator('#country').selectOption('India');
+await selectOption(page.locator('#country'), 'India');
+```
+
+### Check / Uncheck Checkbox
+```javascript
+await page.check('#acceptTerms');
+await page.locator('#acceptTerms').check();
+await check(page.locator('#acceptTerms'));
+
+await page.uncheck('#acceptTerms');
+await page.locator('#acceptTerms').uncheck();
+await uncheck(page.locator('#acceptTerms'));
+```
+
+### Hover Over Element
+```javascript
+await page.hover('.menu-item');
+await page.locator('.menu-item').hover();
+await hover(page.locator('.menu-item'));
+```
+
+### Upload a File
+```javascript
+await page.setInputFiles('input[type=file]', 'path/to/file.txt');
+await page.locator('input[type=file]').setInputFiles('path/to/file.txt');
+await setInputFiles(page.locator('input[type=file]'), 'path/to/file.txt');
+```
+
+### Wait for Element
+```javascript
+await page.waitForSelector('#loadedContent');
+await waitForSelector(page, '#loadedContent');
+```
+
+### Wait for Timeout
+```javascript
+await page.waitForTimeout(3000); // 3 seconds
+await waitForTimeout(page, 3000);
+```
+
+### Get Text Content
+```javascript
+const text = await page.textContent('.message');
+const text2 = await page.locator('.message').textContent();
+const text3 = await textContent(page.locator('.message'));
+```
+
+### Get Attribute Value
+```javascript
+const value = await page.getAttribute('#username', 'value');
+const value2 = await page.locator('#username').getAttribute('value');
+const value3 = await getAttribute(page.locator('#username'), 'value');
+```
+
+### Screenshot
+```javascript
+await page.screenshot({ path: 'screenshot.png' });
+await screenshot(page, { path: 'screenshot.png' });
+```
+
+
+## 5. Playwright Assertions
+
+Playwright uses the built-in **expect** library for assertions.
+
+### Visibility & Presence
+```javascript
+await expect(page.locator('#logo')).toBeVisible();
+await expect(page.locator('#loading')).toBeHidden();
+await expect(page.locator('#welcome')).toHaveCount(1);
+```
+
+### Text Assertions
+```javascript
+await expect(page.locator('h1')).toHaveText('Welcome');
+await expect(page.locator('.title')).toContainText('Playwright');
+await expect(page.locator('.msg')).not.toContainText('Error');
+```
+
+### Value & Attribute Assertions
+```javascript
+await expect(page.locator('#username')).toHaveValue('admin');
+await expect(page.locator('#username')).toHaveAttribute('placeholder', 'Enter username');
+```
+
+### Checkbox / Radio
+```javascript
+await expect(page.locator('#acceptTerms')).toBeChecked();
+await expect(page.locator('#newsletter')).not.toBeChecked();
+```
+
+### State Assertions
+```javascript
+await expect(page.locator('#submit')).toBeEnabled();
+await expect(page.locator('#submit')).toBeDisabled();
+```
+
+### Page Assertions
+```javascript
+await expect(page).toHaveURL('https://example.com/dashboard');
+await expect(page).toHaveTitle('Dashboard');
+```
+
+### Basic Matchers
+```javascript
+expect(5).toBe(5);
+expect(value).not.toBeNull();
+expect(items.length).toBeGreaterThan(0);
+expect(score).toBeLessThanOrEqual(100);
+```
+
+---
+
+## 6. Allure Report Integration with Playwright
+
+### Install Allure Packages
+```bash
+npm install --save-dev @playwright/test allure-playwright
+npm install -g allure-commandline --save-dev
+```
+
+### Update `playwright.config.js`
+```javascript
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  reporter: [
+    ['list'],
+    ['allure-playwright']
+  ],
+});
+```
+
+### Run Tests with Allure Results
+```bash
+npx playwright test --reporter=allure-playwright
+```
+
+### Generate Allure Report
+```bash
+allure generate ./allure-results --clean -o ./allure-report
+```
+
+### Open Allure Report
+```bash
+allure open ./allure-report
+```
+
+---
+
+## References
+- [Playwright Docs](https://playwright.dev/docs/intro)
+- [Allure Playwright](https://github.com/allure-framework/allure-js)
+- [Node.js Download](https://nodejs.org)
